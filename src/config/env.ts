@@ -12,6 +12,8 @@ const EnvSchema = z.object({
   API_BASE_URL: z.url().default('http://localhost:4000'),
   FRONTEND_URL: z.url().default('http://localhost:5173'),
   CORS_ORIGINS: z.string().optional().default(''),
+  // Built frontend (index.html + assets) served by the API for single-origin deploys. Ignored when missing.
+  WEB_DIR: z.string().default('public'),
 
   BACKEND_FRAMEWORK: z.enum(['express', 'hapi']).default('express'),
   DATABASE_TYPE: z.enum(['mysql', 'mongodb']).default('mysql'),

@@ -1,4 +1,6 @@
+import { existsSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
+import path from 'node:path';
 import cors from 'cors';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import type { Env } from '../../config/env';
@@ -27,6 +29,32 @@ function send(res: Response, out: NormalizedResponse) {
 }
 
 const errorJson = (code: string, message: string) => JSON.stringify({ success: false, error: { code, details: [] }, message });
+
+/** Paths owned by the API; they never fall back to the frontend's index.html. */
+const API_PATHS = /^\/(api|uploads|files|health)(\/|$)/;
+
+/** Serve the built frontend from WEB_DIR (when present) with an SPA fallback, so site and API share one origin. */
+function serveWeb(app: express.Express, env: Env) {
+  const dir = path.resolve(env.WEB_DIR);
+  const indexHtml = path.join(dir, 'index.html');
+  if (!existsSync(indexHtml)) return;
+
+  app.use(
+    express.static(dir, {
+      index: false,
+      setHeaders(res, file) {
+        // Vite emits content-hashed files under assets/; everything else must revalidate.
+        const hashed = file.includes(`${path.sep}assets${path.sep}`);
+        res.setHeader('cache-control', hashed ? 'public, max-age=31536000, immutable' : 'no-cache');
+      },
+    }),
+  );
+  app.get(/.*/, (req: Request, res: Response, next: NextFunction) => {
+    if (API_PATHS.test(req.path) || !req.accepts('html')) return next();
+    res.setHeader('cache-control', 'no-cache');
+    res.sendFile(indexHtml);
+  });
+}
 
 export function createExpressAdapter(env: Env): HttpAdapter {
   const app = express();
@@ -67,6 +95,8 @@ export function createExpressAdapter(env: Env): HttpAdapter {
           send(res, out);
         });
       }
+
+      serveWeb(app, env);
 
       app.use((_req: Request, res: Response) => {
         res.status(404).type('application/json').send(errorJson('NOT_FOUND', 'Route not found'));
