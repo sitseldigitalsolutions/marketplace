@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "dotenv -e .env -- tsx watch --clear-screen=false src/server.ts",
     "start": "node dist/server.js",
-    "build": "tsup",
+    "build": "prisma generate && tsup",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
     "test": "dotenv -e .env.test -e .env -- vitest run",

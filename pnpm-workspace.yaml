@@ -1,4 +1,14 @@
 # Standalone backend deploy (e.g. Hostinger). Native / postinstall builds: Prisma engines, argon2, esbuild, sharp.
+# pnpm 10 reads onlyBuiltDependencies; pnpm 11 reads allowBuilds.
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - argon2
+  - esbuild
+  - msgpackr-extract
+  - prisma
+  - sharp
+
 allowBuilds:
   '@prisma/client': true
   '@prisma/engines': true
