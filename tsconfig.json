@@ -19,5 +19,5 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "prisma/seed.ts", "test", "vitest.config.ts", "tsup.config.ts"]
+  "include": ["src", "prisma/seed.ts", "tsup.config.ts"]
 }
