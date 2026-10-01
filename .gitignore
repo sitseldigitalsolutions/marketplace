@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+*.log
+
+# Secrets — only the *.example templates are committed
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Runtime data
+uploads/
+uploads-test/
+uploads-e2e/
+exports/
